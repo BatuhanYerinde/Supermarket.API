@@ -21,6 +21,7 @@ namespace Supermarket.API
             });
 
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
 
             builder.Services.AddControllers();
