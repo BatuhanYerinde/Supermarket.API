@@ -16,6 +16,8 @@ namespace Supermarket.API
 
             // Add services to the container.
 
+            builder.Services.AddMemoryCache();
+
             builder.Services.AddDbContext<AppDbContext>(options => {
                 options.UseInMemoryDatabase("supermarket-api-in-memory-database");
             });

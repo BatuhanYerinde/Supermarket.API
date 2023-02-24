@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Supermarket.API.Domain.Models;
+using Supermarket.API.Domain.Models.Queries;
 using Supermarket.API.Domain.Services;
 using Supermarket.API.Resources;
 
@@ -18,12 +19,18 @@ namespace Supermarket.API.Controllers
             _mapper = mapper;
         }
 
+     
         [HttpGet]
-        public async Task<IEnumerable<ProductResource>> ListAsync()
+        [ProducesResponseType(typeof(QueryResultResource<ProductResource>), 200)]
+        public async Task<QueryResultResource<ProductResource>> ListAsync([FromQuery] ProductsQueryResource query)
         {
-            var products = await _productService.ListAsync();
-            var resources = _mapper.Map<IEnumerable<Product>, IEnumerable<ProductResource>>(products);
-            return resources;
+            var productsQuery = _mapper.Map<ProductsQueryResource, ProductsQuery>(query);
+            var queryResult = await _productService.ListAsync(productsQuery);
+
+            var resource = _mapper.Map<QueryResult<Product>, QueryResultResource<ProductResource>>(queryResult);
+            return resource;
         }
+
+
     }
 }

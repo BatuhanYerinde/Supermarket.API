@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Supermarket.API.Domain.Models;
+using Supermarket.API.Domain.Models.Queries;
 using Supermarket.API.Resources;
 
 namespace Supermarket.API.Mapping
@@ -9,6 +10,8 @@ namespace Supermarket.API.Mapping
         public ResourceToModelProfile()
         {
             CreateMap<SaveCategoryResource, Category>();
+
+            CreateMap<ProductsQueryResource, ProductsQuery>();
         }
     }
 }
