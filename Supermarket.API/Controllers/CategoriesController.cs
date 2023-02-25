@@ -7,9 +7,7 @@ using Supermarket.API.Resources;
 
 namespace Supermarket.API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class CategoriesController : ControllerBase
+    public class CategoriesController : BaseApiController
     {
         private readonly ICategoryService _categoryService;
         private readonly IMapper _mapper;
@@ -38,7 +36,7 @@ namespace Supermarket.API.Controllers
             var result = await _categoryService.SaveAsync(category);
             if (!result.Success)
                 return BadRequest(result.Message);
-            var categoryResource = _mapper.Map<Category, CategoryResource>(result.Category);
+            var categoryResource = _mapper.Map<Category, CategoryResource>(result.Resource);
             return Ok(categoryResource);
         }
 
@@ -54,7 +52,7 @@ namespace Supermarket.API.Controllers
             if (!result.Success)
                 return BadRequest(result.Message);
 
-            var categoryResource = _mapper.Map<Category, CategoryResource>(result.Category);
+            var categoryResource = _mapper.Map<Category, CategoryResource>(result.Resource);
             return Ok(categoryResource);
         }
 
@@ -66,7 +64,7 @@ namespace Supermarket.API.Controllers
             if (!result.Success)
                 return BadRequest(result.Message);
 
-            var categoryResource = _mapper.Map<Category, CategoryResource>(result.Category);
+            var categoryResource = _mapper.Map<Category, CategoryResource>(result.Resource);
             return Ok(categoryResource);
         }
     }

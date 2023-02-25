@@ -7,8 +7,7 @@ using Supermarket.API.Resources;
 
 namespace Supermarket.API.Controllers
 {
-    [Route("/api/[controller]")]
-    public class ProductsController : Controller
+    public class ProductsController : BaseApiController
     {
         private readonly IProductService _productService;
         private readonly IMapper _mapper;
@@ -31,6 +30,54 @@ namespace Supermarket.API.Controllers
             return resource;
         }
 
+        [HttpPost]
+        [ProducesResponseType(typeof(ProductResource), 201)]
+        [ProducesResponseType(typeof(ErrorResource), 400)]
+        public async Task<IActionResult> PostAsync([FromBody] SaveProductResource resource)
+        {
+            var product = _mapper.Map<SaveProductResource, Product>(resource);
+            var result = await _productService.SaveAsync(product);
 
+            if (!result.Success)
+            {
+                return BadRequest(new ErrorResource(result.Message));
+            }
+
+            var productResource = _mapper.Map<Product, ProductResource>(result.Resource);
+            return Ok(productResource);
+        }
+
+        [HttpPut("{id}")]
+        [ProducesResponseType(typeof(ProductResource), 201)]
+        [ProducesResponseType(typeof(ErrorResource), 400)]
+        public async Task<IActionResult> PutAsync(int id, [FromBody] SaveProductResource resource)
+        {
+            var product = _mapper.Map<SaveProductResource, Product>(resource);
+            var result = await _productService.UpdateAsync(id, product);
+
+            if (!result.Success)
+            {
+                return BadRequest(new ErrorResource(result.Message));
+            }
+
+            var productResource = _mapper.Map<Product, ProductResource>(result.Resource);
+            return Ok(productResource);
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(ProductResource), 200)]
+        [ProducesResponseType(typeof(ErrorResource), 400)]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            var result = await _productService.DeleteAsync(id);
+
+            if (!result.Success)
+            {
+                return BadRequest(new ErrorResource(result.Message));
+            }
+
+            var productResource = _mapper.Map<Product, ProductResource>(result.Resource);
+            return Ok(productResource);
+        }
     }
 }
