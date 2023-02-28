@@ -5,6 +5,10 @@ using Supermarket.API.Domain.Services;
 using Supermarket.API.Persistence.Repositories;
 using Supermarket.API.Services;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
+using StackExchange.Redis;
+using Supermarket.API.Domain.Services.Cache;
+using Supermarket.API.Services.Cache;
 
 namespace Supermarket.API
 {
@@ -13,8 +17,11 @@ namespace Supermarket.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            IConfiguration configuration = builder.Configuration;
 
             // Add services to the container.
+            var multiplexer = ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisHost"));
+            builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
 
             builder.Services.AddMemoryCache();
 
@@ -28,6 +35,7 @@ namespace Supermarket.API
 
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<ICacheService, CacheService>();
 
             builder.Services.AddControllers();
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
