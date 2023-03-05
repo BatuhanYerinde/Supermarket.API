@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Supermarket.API.Domain.Models;
 using Supermarket.API.Domain.Models.Queries;
@@ -7,6 +8,7 @@ using Supermarket.API.Resources;
 
 namespace Supermarket.API.Controllers
 {
+    [Authorize]
     public class ProductsController : BaseApiController
     {
         private readonly IProductService _productService;

@@ -18,6 +18,7 @@ namespace Supermarket.API.Mapping
 
             CreateMap<QueryResult<Product>, QueryResultResource<ProductResource>>();
 
+            CreateMap<User, UserResource>();
         }
     }
 }
