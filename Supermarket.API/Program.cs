@@ -1,18 +1,18 @@
-using Supermarket.API.Persistence.Contexts;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 using Supermarket.API.Domain.Repositories;
 using Supermarket.API.Domain.Services;
+using Supermarket.API.Domain.Services.Cache;
+using Supermarket.API.Handler;
+using Supermarket.API.Persistence.Contexts;
 using Supermarket.API.Persistence.Repositories;
 using Supermarket.API.Services;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
-using StackExchange.Redis;
-using Supermarket.API.Domain.Services.Cache;
 using Supermarket.API.Services.Cache;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
 using System.Text;
-using Supermarket.API.Handler;
 
 namespace Supermarket.API
 {
@@ -55,12 +55,20 @@ namespace Supermarket.API
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<ICacheService, CacheService>();
-            
+
             builder.Services.AddSingleton<IConfiguration>(configuration);
             builder.Services.AddScoped<TokenService>();
 
+            builder.Services.AddControllers()
+                .AddFluentValidation(options =>
+                {
+                    options.AutomaticValidationEnabled = false;
+                    options.ImplicitlyValidateChildProperties = true;
+                    options.ImplicitlyValidateRootCollectionElements = true;
 
-            builder.Services.AddControllers();
+                    options.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+                });
+
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

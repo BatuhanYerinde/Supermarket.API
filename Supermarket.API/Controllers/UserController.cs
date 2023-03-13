@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -15,11 +16,17 @@ namespace Supermarket.API.Controllers
         readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
-        public UserController(IConfiguration configuration, IMapper mapper, IUserService userService)
+        private readonly IValidator<SaveUserResource> _saveUserResourceValidator;
+        private readonly IValidator<UserLogin> _userLoginValidator;
+ 
+        public UserController(IConfiguration configuration, IMapper mapper, IUserService userService,
+            IValidator<SaveUserResource> saveUserResourceValidator, IValidator<UserLogin> userLoginValidator)
         {
             _mapper = mapper;
             _configuration = configuration;
             _userService = userService;
+            _saveUserResourceValidator = saveUserResourceValidator;
+            _userLoginValidator = userLoginValidator;
         }
 
         [HttpPost("[action]")]
@@ -27,6 +34,13 @@ namespace Supermarket.API.Controllers
         [ProducesResponseType(typeof(ErrorResource), 400)]
         public async Task<IActionResult> SaveAsync([FromBody] SaveUserResource resource)
         {
+            var validationResult = _saveUserResourceValidator.Validate(resource);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(err => err.ErrorMessage)?.ToList();
+                return BadRequest(new ErrorResource(errors));
+            }
+
             var user = _mapper.Map<SaveUserResource, User>(resource);
             var result = await _userService.SaveAsync(user);
 
@@ -44,6 +58,12 @@ namespace Supermarket.API.Controllers
         [ProducesResponseType(typeof(ErrorResource), 400)]
         public async Task<IActionResult> LoginAsync([FromBody] UserLogin userLogin)
         {
+            var validationResult = _userLoginValidator.Validate(userLogin);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(err => err.ErrorMessage)?.ToList();
+                return BadRequest(new ErrorResource(errors));
+            }
             var result = await _userService.CheckUserExistAndCreateAccessTokenAsync(userLogin);
 
             if (!result.Success)
