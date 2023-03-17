@@ -2,6 +2,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using StackExchange.Redis;
 using Supermarket.API.Domain.Repositories;
 using Supermarket.API.Domain.Services;
@@ -24,6 +25,9 @@ namespace Supermarket.API
             IConfiguration configuration = builder.Configuration;
 
             var connectionString = configuration.GetConnectionString("SuperMarketDatabase");
+            var logger = new LoggerConfiguration().ReadFrom.Configuration(configuration).CreateLogger();
+            builder.Logging.ClearProviders();
+            builder.Logging.AddSerilog(logger);
             builder.Services.AddDbContext<AppDbContext>(x => x.UseSqlServer(connectionString));
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(option =>

@@ -18,15 +18,18 @@ namespace Supermarket.API.Controllers
         private readonly IUserService _userService;
         private readonly IValidator<SaveUserResource> _saveUserResourceValidator;
         private readonly IValidator<UserLogin> _userLoginValidator;
- 
+        private readonly ILogger<UserController> _logger;
+
         public UserController(IConfiguration configuration, IMapper mapper, IUserService userService,
-            IValidator<SaveUserResource> saveUserResourceValidator, IValidator<UserLogin> userLoginValidator)
+            IValidator<SaveUserResource> saveUserResourceValidator, IValidator<UserLogin> userLoginValidator,
+            ILogger<UserController> logger)
         {
             _mapper = mapper;
             _configuration = configuration;
             _userService = userService;
             _saveUserResourceValidator = saveUserResourceValidator;
             _userLoginValidator = userLoginValidator;
+            _logger = logger;
         }
 
         [HttpPost("[action]")]
@@ -70,6 +73,7 @@ namespace Supermarket.API.Controllers
             {
                 return BadRequest(new ErrorResource(result.Message));
             }
+            _logger.LogInformation("Login is successful!");
             return Ok(result.Resource);
         }
 
